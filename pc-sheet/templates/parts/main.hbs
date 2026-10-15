@@ -2,8 +2,9 @@
 <div class="f2f-ctl">
 	<span>Group powers by</span>
 	<span class="f2f-group">
-		<button type="button" data-group="action" class="{{#if (f2fEq f2f.groupBy 'action')}}on{{/if}}">Action</button><button type="button" data-group="usage" class="{{#if (f2fEq f2f.groupBy 'usage')}}on{{/if}}">Power Type</button>
+		<button type="button" data-group="usage" class="{{#if (f2fEq f2f.groupBy 'usage')}}on{{/if}}">Power Type</button><button type="button" data-group="action" class="{{#if (f2fEq f2f.groupBy 'action')}}on{{/if}}">Action</button><button type="button" data-group="custom" class="{{#if (f2fEq f2f.groupBy 'custom')}}on{{/if}}">Custom</button>
 	</span>
+	{{#if f2f.isCustom}}<a class="f2f-newgroup" data-tooltip="Make a new group, then drag powers into it"><i class="fas fa-plus"></i> New group</a>{{/if}}
 </div>
 {{/if}}
 

@@ -57,6 +57,8 @@
 
 .f2f-pc .f2f-abilities { flex: none; background: var(--f2f-paper); padding: 4px 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px 10px; border-bottom: 1px solid var(--f2f-rule); }
 .f2f-pc .f2f-abilities > span { white-space: nowrap; }
+.f2f-pc .f2f-defband { flex: none; background: var(--f2f-paper); padding: 4px 12px; display: grid; grid-template-columns: repeat(4, auto); justify-content: space-between; gap: 1px 10px; border-bottom: 1px solid var(--f2f-rule); font-size: 1.1em; }
+.f2f-pc .f2f-defband > span { white-space: nowrap; }
 .f2f-pc .f2f-extra { flex: none; background: var(--f2f-paper); padding: 4px 12px 5px; border-bottom: 1px solid var(--f2f-rule); }
 .f2f-pc .f2f-extra .auto { font-weight: 700; }
 .f2f-pc .f2f-btns { flex: none; display: flex; flex-wrap: wrap; gap: 4px; padding: 5px 10px; background: var(--f2f-paper); }
@@ -91,6 +93,19 @@
 .f2f-pc ol.f2f-powers, .f2f-pc ol.f2f-list { list-style: none; margin: 0; padding: 0; }
 .f2f-pc .f2f-ph, .f2f-pc .f2f-row { display: flex; align-items: center; gap: 6px; background: var(--f2f-row); padding: 1px 10px 2px 6px; border-top: 1px solid var(--f2f-paper); min-height: 22px; }
 .f2f-pc .f2f-ph .nm { font-weight: 700; flex: 1; min-width: 0; color: var(--f2f-ink); }
+/* Power rows: the name uses the power, the rest of the bar opens it */
+.f2f-pc .f2f-power > .f2f-ph { cursor: pointer; }
+.f2f-pc .f2f-power .f2f-ph .nm { flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.f2f-pc .f2f-power .f2f-ph .nm:hover { text-decoration: underline; }
+.f2f-pc .f2f-power .f2f-fill { flex: 1 1 auto; align-self: stretch; min-width: 8px; }
+.f2f-pc .f2f-power .f2f-ph .use { text-align: right; }
+.f2f-pc .f2f-power .f2f-slot { flex: none; width: 14px; height: 14px; display: inline-flex; }
+/* Custom groups */
+.f2f-pc .f2f-ctl .f2f-group { margin-left: auto; }
+.f2f-pc .f2f-newgroup { margin-left: 4px; white-space: nowrap; }
+.f2f-pc h2.f2f-sec .f2f-group-rename { margin-left: auto; margin-right: 10px; }
+.f2f-pc h2.f2f-sec .f2f-group-delete { margin-right: 14px; }
+.f2f-pc h2.f2f-sec .f2f-group-rename + .f2f-group-delete + .power-create { margin-left: 0; }
 .f2f-pc .f2f-ph .use { font-weight: 700; white-space: nowrap; }
 .f2f-pc .tag { font-size: 0.78em; color: var(--f2f-soft); white-space: nowrap; }
 .f2f-pc .f2f-ph .uses { font-size: 0.85em; }

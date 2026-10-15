@@ -1,0 +1,1 @@
+export default class ActorSheet4e { static get defaultOptions(){return {classes:[]};} }; export const Helper = {};

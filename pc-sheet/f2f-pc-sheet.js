@@ -35,6 +35,10 @@ const ACTION_WORDS = {
 	standard: "Standard Action", move: "Move Action", minor: "Minor Action", free: "Free Action",
 	reaction: "Immediate Reaction", interrupt: "Immediate Interrupt", opportunity: "Opportunity Action", none: "No Action"
 };
+const ACTION_SHORT = {
+	standard: "Standard", move: "Move", minor: "Minor", free: "Free",
+	reaction: "Reaction", interrupt: "Interrupt", opportunity: "Opportunity", none: "No Action"
+};
 const ACTION_ICONS = {
 	standard: "fa-swords", move: "fa-person-running", minor: "fa-hand", free: "fa-bolt",
 	reaction: "fa-reply", interrupt: "fa-hand-back-fist", opportunity: "fa-eye", none: "fa-circle"
@@ -64,6 +68,19 @@ export class F2FCharacterSheet extends ActorSheet4e {
 		});
 	}
 
+	// Keep the sheet where the player has scrolled it whenever it redraws
+	// (opening a power, marking it used, changing grouping and so on).
+	async _render(force, options) {
+		const scrollOf = () => this.element?.[0]?.querySelector?.(".f2f-form");
+		const top = scrollOf()?.scrollTop ?? 0;
+		await super._render(force, options);
+		if (!top) return;
+		const form = scrollOf();
+		if (!form) return;
+		form.scrollTop = top;
+		requestAnimationFrame(() => { if (form.isConnected && Math.abs(form.scrollTop - top) > 1) form.scrollTop = top; });
+	}
+
 	get template() {
 		if (!game.user.isGM && this.actor.limited) return `${TPL}/limited.hbs`;
 		return `${TPL}/pc-sheet.hbs`;
@@ -71,12 +88,31 @@ export class F2FCharacterSheet extends ActorSheet4e {
 
 	/* ---------- Grouping and ordering ---------- */
 
+	// Power Type is the default; a player's saved choice wins.
 	get groupBy() {
 		const g = sheetFlag(this.actor, "groupBy");
-		return g === "usage" ? "usage" : "action";
+		return ["action", "custom"].includes(g) ? g : "usage";
+	}
+
+	// The player's own power groups for Custom mode: [{ id, label }]
+	get customGroups() {
+		const g = sheetFlag(this.actor, "customGroups");
+		return Array.isArray(g) ? g.filter(x => x?.id) : [];
+	}
+
+	_customGroupOf(power) {
+		const item = this.actor.items.get(power._id ?? power.id) ?? power;
+		const id = sheetFlag(item, "customGroup");
+		return this.customGroups.some(g => g.id === id) ? id : "unsorted";
 	}
 
 	_generatePowerGroups() {
+		if (this.groupBy === "custom") {
+			const groups = {};
+			for (const g of this.customGroups) groups[g.id] = { key: g.id, label: g.label, custom: true, items: [], dataset: { type: g.id } };
+			groups.unsorted = { key: "unsorted", label: "Unsorted Powers", items: [], dataset: { type: "unsorted" } };
+			return groups;
+		}
 		const defs = this.groupBy === "usage" ? USAGE_GROUPS : ACTION_GROUPS;
 		const groups = {};
 		for (const [key, def] of Object.entries(defs)) {
@@ -87,6 +123,7 @@ export class F2FCharacterSheet extends ActorSheet4e {
 
 	_groupPowers(power, groups) {
 		const sys = power.system;
+		if (this.groupBy === "custom") return this._customGroupOf(power);
 		if (this.groupBy === "usage") {
 			return groups[sys.useType] ? sys.useType : "other";
 		}
@@ -114,6 +151,10 @@ export class F2FCharacterSheet extends ActorSheet4e {
 		event.preventDefault();
 		const type = event.currentTarget.dataset.type;
 		const system = { autoGenChatPowerCard: game.settings.get("dnd4e", "powerAutoGenerateLableOption") };
+		if (this.groupBy === "custom") {
+			const flags = type && type !== "unsorted" ? { [MOD]: { customGroup: type } } : {};
+			return this.actor.createEmbeddedDocuments("Item", [{ name: "New Power", type: "power", system, flags }]);
+		}
 		if (this.groupBy === "usage") {
 			system.useType = type;
 			if (["encounter", "daily", "recharge", "item"].includes(type)) {
@@ -228,9 +269,11 @@ export class F2FCharacterSheet extends ActorSheet4e {
 			if (!g) continue;
 			const items = g.items.map(p => this._powerRow(p, actorObj));
 			if (!items.length && ["other", "recharge", "item"].includes(key)) continue;
-			f2f.powerSections.push({ key, label: g.label, dataset: g.dataset, items, usage: this.groupBy === "usage" ? key : "" });
+			if (!items.length && key === "unsorted" && this.customGroups.length) continue;
+			f2f.powerSections.push({ key, label: g.label, dataset: g.dataset, items, custom: !!g.custom, isCustomMode: this.groupBy === "custom", usage: this.groupBy === "usage" ? key : "" });
 		}
 		f2f.groupBy = this.groupBy;
+		f2f.isCustom = this.groupBy === "custom";
 		f2f.hasTraits = f2f.traits.length > 0;
 
 		// Actions tab: the actions every character has
@@ -299,9 +342,11 @@ export class F2FCharacterSheet extends ActorSheet4e {
 		const use = sys.useType || "other";
 		const open = this._f2fOpen.has(p.id);
 		const hasUses = !!sys.uses?.per && (sys.preparedMaxUses > 0);
+		const useLabel = game.i18n.localize(CONFIG.DND4EBETA.powerUseType?.[use] ?? "") || "";
 		const row = {
 			id: p.id, name: p.name, img: p.img, use,
-			useLabel: game.i18n.localize(CONFIG.DND4EBETA.powerUseType?.[use] ?? "") || "",
+			// Grouped by Power Type, the section already says the usage, so the row shows the action instead.
+			typeLabel: this.groupBy === "usage" ? (ACTION_SHORT[sys.actionType] ?? useLabel) : useLabel,
 			actionWord: ACTION_WORDS[sys.actionType] ?? "",
 			icon: ACTION_ICONS[sys.actionType] ?? "fa-circle",
 			hasUses,
@@ -413,7 +458,26 @@ export class F2FCharacterSheet extends ActorSheet4e {
 		super.activateListeners(html);
 		const el = html[0];
 
-		// Open and close power and trait rows (anyone who can see the sheet)
+		// A power's heading bar opens and closes it; its name, icon and controls do their own thing.
+		html.find(".f2f-power > .f2f-ph").on("click", ev => {
+			if (ev.target.closest("a, input, button, .f2f-handle, .item-control, .rollable")) return;
+			ev.preventDefault();
+			const id = ev.currentTarget.closest("[data-item-id]")?.dataset.itemId;
+			if (this._f2fOpen.has(id)) this._f2fOpen.delete(id); else this._f2fOpen.add(id);
+			this.render(false);
+		});
+
+		// Clicking a power's name uses it, the same as its icon (owners only; others just open it).
+		html.find(".f2f-power .f2f-use-name").on("click", ev => {
+			ev.preventDefault();
+			ev.stopPropagation();
+			if (this.isEditable) return this._onItemRoll(ev);
+			const id = ev.currentTarget.closest("[data-item-id]")?.dataset.itemId;
+			if (this._f2fOpen.has(id)) this._f2fOpen.delete(id); else this._f2fOpen.add(id);
+			this.render(false);
+		});
+
+		// Open and close trait and action rows (anyone who can see the sheet)
 		html.find(".f2f-row-toggle").on("click", ev => {
 			ev.preventDefault();
 			const id = ev.currentTarget.closest("[data-item-id]")?.dataset.itemId ?? ev.currentTarget.closest("[data-act]")?.dataset.act;
@@ -435,6 +499,17 @@ export class F2FCharacterSheet extends ActorSheet4e {
 		html.find(".f2f-group button").on("click", ev => {
 			ev.preventDefault();
 			this.actor.setFlag(MOD, "groupBy", ev.currentTarget.dataset.group);
+		});
+
+		// Custom groups: make, rename and remove
+		html.find(".f2f-newgroup").on("click", ev => { ev.preventDefault(); this._editCustomGroup(); });
+		html.find(".f2f-group-rename").on("click", ev => {
+			ev.preventDefault(); ev.stopPropagation();
+			this._editCustomGroup(ev.currentTarget.closest("[data-sec]").dataset.sec);
+		});
+		html.find(".f2f-group-delete").on("click", ev => {
+			ev.preventDefault(); ev.stopPropagation();
+			this._deleteCustomGroup(ev.currentTarget.closest("[data-sec]").dataset.sec);
 		});
 
 		// Used box on encounter, daily, item and recharge powers
@@ -501,21 +576,69 @@ export class F2FCharacterSheet extends ActorSheet4e {
 		}
 	}
 
+	/* ---------- Custom groups ---------- */
+
+	async _editCustomGroup(id) {
+		const groups = foundry.utils.deepClone(this.customGroups);
+		const g = groups.find(x => x.id === id);
+		const label = await new Promise(resolve => new Dialog({
+			title: g ? "Rename power group" : "New power group",
+			content: `<form><div class="form-group"><label>Name</label><input type="text" name="label" value="${esc(g?.label ?? "")}" placeholder="e.g. Opening moves" autofocus></div></form>`,
+			buttons: {
+				ok: { icon: '<i class="fas fa-check"></i>', label: g ? "Rename" : "Create", callback: html => resolve(html.find("[name=label]").val()?.trim()) },
+				cancel: { label: "Cancel", callback: () => resolve(null) }
+			},
+			default: "ok",
+			close: () => resolve(null)
+		}).render(true));
+		if (!label) return;
+		if (g) g.label = label;
+		else groups.push({ id: foundry.utils.randomID(8), label });
+		return this.actor.setFlag(MOD, "customGroups", groups);
+	}
+
+	async _deleteCustomGroup(id) {
+		const g = this.customGroups.find(x => x.id === id);
+		if (!g) return;
+		const ok = await Dialog.confirm({ title: "Remove power group", content: `<p>Remove the group <b>${esc(g.label)}</b>? Its powers move to Unsorted Powers.</p>` });
+		if (!ok) return;
+		await this.actor.setFlag(MOD, "customGroups", this.customGroups.filter(x => x.id !== id));
+		const moved = this.actor.items.filter(i => i.type === "power" && sheetFlag(i, "customGroup") === id).map(i => ({ _id: i.id, [`flags.${MOD}.customGroup`]: null }));
+		if (moved.length) await this.actor.updateEmbeddedDocuments("Item", moved);
+	}
+
 	// Powers dropped onto another power's row take its place in the order.
+	// In Custom mode, a power dropped anywhere in a group also joins that group.
 	async _onSortItem(event, itemData) {
 		const source = this.actor.items.get(itemData._id);
 		if (!source) return;
 		const dropTarget = event.target.closest("[data-item-id]");
 		const target = dropTarget ? this.actor.items.get(dropTarget.dataset.itemId) : null;
-		if (!target || target.id === source.id) return;
+		let groupUpdate = null;
+		if (this.groupBy === "custom" && source.type === "power") {
+			const sec = event.target.closest(".f2f-secwrap[data-sec]")?.dataset.sec;
+			if (sec && sec !== "traits") {
+				const want = sec === "unsorted" ? null : sec;
+				const have = this._customGroupOf(source) === "unsorted" ? null : this._customGroupOf(source);
+				if (want !== have) groupUpdate = { [`flags.${MOD}.customGroup`]: want };
+			}
+		}
+		if (!target || target.id === source.id || target.type !== "power" && groupUpdate) {
+			if (groupUpdate) return source.update(groupUpdate);
+			return;
+		}
 		// Features and traits sort among all non-inventory feature types
 		const sameKind = i => source.type === "power" ? i.type === "power"
 			: INVENTORY_TYPES.includes(source.type) ? INVENTORY_TYPES.includes(i.type)
 			: (!INVENTORY_TYPES.includes(i.type) && i.type !== "power");
 		if (!sameKind(target)) return;
 		const siblings = this.actor.items.filter(i => sameKind(i) && i.id !== source.id);
-		const updates = SortingHelpers.performIntegerSort(source, { target, siblings, sortBefore: true });
-		return this.actor.updateEmbeddedDocuments("Item", updates.map(u => ({ _id: u.target.id, ...u.update })));
+		const updates = SortingHelpers.performIntegerSort(source, { target, siblings, sortBefore: true }).map(u => ({ _id: u.target.id, ...u.update }));
+		if (groupUpdate) {
+			const own = updates.find(u => u._id === source.id);
+			if (own) Object.assign(own, groupUpdate); else updates.push({ _id: source.id, ...groupUpdate });
+		}
+		return this.actor.updateEmbeddedDocuments("Item", updates);
 	}
 }
 

@@ -18,6 +18,16 @@ All settings are under Configure Settings > Module Settings > Fire to Fire: Tabl
 2. Commit and push to `main`.
 3. The Release workflow sees a version with no release yet, zips the module and publishes release `vX.Y.Z` with `module.json` and `f2f-tools.zip`, which Foundry picks up.
 
+## Character sheet changes (v1.9)
+- **Grouping:** the buttons read Power Type, Action, Custom, and Power Type is the default for any character that hasn't picked one. Characters that already chose Action keep it until the player clicks Power Type.
+- **Right-hand column:** under Power Type, each row shows its action (Standard, Move, Minor, Free, Interrupt, Reaction, Opportunity, No Action), because the section already says At-Will, Encounter or Daily. Under Action and Custom it shows the usage as before. The text now lines up on the right on every row, whether or not the row has a used box.
+- **Clicking a power:** clicking its name uses it, the same as the icon. Clicking anywhere else on its bar opens or closes the text.
+- **Custom grouping:** click Custom, then **New group** to make a labelled group. Drag powers into a group, either onto its bar or onto a power already in it, to move them there in that spot. The pencil renames a group, and the bin removes it (its powers go back to Unsorted Powers). Groups can be dragged into any order like the other sections, and **+ Add** in a group creates the new power there. Groups are saved per character and stay when switching between groupings.
+- **Defenses:** AC, Fortitude, Reflex and Will now have their own band at the top of the sheet, above HP. Perception and Insight share a line to keep the block the same height.
+- **Scrolling:** opening a power, marking it used or any other change no longer jumps the sheet back to the top.
+
+Tested in Chromium with Ven's powers from the world data: 20/20 checks (default grouping, action words, column alignment in two groupings, name and bar clicks, scroll kept while opening a power, used box, defenses band, making, filling, renaming and removing custom groups, + Add in a group, groups kept across grouping changes). The harness uses a stand-in for Foundry and the dnd4e base sheet, not the real ones. Not tested in a live Foundry.
+
 ## Character sheet (v1.8)
 The Fire to Fire stat-block character sheet now ships inside Table Tools; it works exactly as the separate `f2f-pc-sheet` module did (see its README in `foundry-tools/f2f-pc-sheet/`). It still needs Fox's 4e Styling for its fonts.
 

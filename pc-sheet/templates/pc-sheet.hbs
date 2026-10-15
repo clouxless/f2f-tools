@@ -14,6 +14,11 @@
 	</header>
 
 	{{!-- Stat block vitals --}}
+	{{!-- Defenses: their own band at the top --}}
+	<section class="f2f-defband">
+		{{#each system.defences as |def d|}}<span data-defence="{{d}}"><b class="def-name rollable" data-tooltip="Roll {{lookup ../f2f.defNames d}}">{{lookup ../f2f.defNames d}}</b> <span class="defence-bonus rollable" data-tooltip="{{lookup ../f2f.defNames d}} bonuses">{{def.value}}</span></span>{{/each}}
+	</section>
+
 	<section class="f2f-vitals">
 		<div class="l">
 			<b class="health-option rollable" data-tooltip="Hit point options">HP</b>
@@ -28,12 +33,7 @@
 			<input class="f2f-num" type="text" name="system.details.surges.value" value="{{system.details.surges.value}}" data-dtype="Number" data-tooltip="Healing surges left" />/{{system.details.surges.max}}
 			<span class="muted surge-bonus rollable" data-tooltip="Surge value and bonuses">({{system.details.surgeValue}} hp)</span>
 		</div>
-		<div class="rt" data-skill="prc"><b class="skill-name rollable" data-tooltip="Roll Perception">Perception</b> <span class="skill-bonus rollable">{{f2fSigned system.skills.prc.total}}</span></div>
-
-		<div class="l f2f-defs">
-			{{#each system.defences as |def d|}}<span data-defence="{{d}}"><b class="def-name rollable" data-tooltip="Roll {{lookup ../f2f.defNames d}}">{{lookup ../f2f.defNames d}}</b> <span class="defence-bonus rollable" data-tooltip="{{lookup ../f2f.defNames d}} bonuses">{{def.value}}</span></span>{{#unless @last}}, {{/unless}}{{/each}}
-		</div>
-		<div class="rt" data-skill="ins"><b class="skill-name rollable" data-tooltip="Roll Insight">Insight</b> <span class="skill-bonus rollable">{{f2fSigned system.skills.ins.total}}</span></div>
+		<div class="rt"><span data-skill="prc"><b class="skill-name rollable" data-tooltip="Roll Perception">Perception</b> <span class="skill-bonus rollable">{{f2fSigned system.skills.prc.total}}</span></span>; <span data-skill="ins"><b class="skill-name rollable" data-tooltip="Roll Insight">Insight</b> <span class="skill-bonus rollable">{{f2fSigned system.skills.ins.total}}</span></span></div>
 
 		<div class="l"><b class="movement-dialog rollable" data-tooltip="{{moveTitle}}">Speed</b> {{system.movement.walk.value}} <span class="muted">(shift {{system.movement.shift.value}}, run {{system.movement.run.value}})</span></div>
 		<div class="rt muted">Passive <span data-passive="pasprc"><span class="passive-message rollable" data-tooltip="Passive Perception">{{system.passive.pasprc.value}}</span></span> / <span data-passive="pasins"><span class="passive-message rollable" data-tooltip="Passive Insight">{{system.passive.pasins.value}}</span></span></div>
