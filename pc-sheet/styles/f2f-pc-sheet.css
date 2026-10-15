@@ -98,7 +98,7 @@
 .f2f-pc .f2f-power .f2f-ph .nm { flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .f2f-pc .f2f-power .f2f-ph .nm:hover { text-decoration: underline; }
 .f2f-pc .f2f-power .f2f-fill { flex: 1 1 auto; align-self: stretch; min-width: 8px; }
-.f2f-pc .f2f-power .f2f-ph .use { text-align: right; }
+.f2f-pc .f2f-power .f2f-ph .use { flex: none; min-width: 6.9em; text-align: left; }
 .f2f-pc .f2f-power .f2f-slot { flex: none; width: 14px; height: 14px; display: inline-flex; }
 /* Custom groups */
 .f2f-pc .f2f-ctl .f2f-group { margin-left: auto; }
