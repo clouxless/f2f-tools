@@ -72,12 +72,30 @@ export function effectData({ status, name, icon, durationType, targetToken, sour
   };
 }
 
-/** Apply conditions to tokens. picks = [{ status?, name, icon }] */
+// The system's coloured ongoing-effect markers (ongoing_1, ongoing_2, ...), in order.
+export function ongoingMarkers() {
+  return (CONFIG.statusEffects ?? []).filter(s => /^ongoing_\d+$/.test(s.id)).sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true })).map(s => s.icon);
+}
+
+// The marker for the next custom effect on this actor: the first colour it isn't already showing, else round again.
+export function nextMarker(actor, taken = []) {
+  const markers = ongoingMarkers();
+  if (!markers.length) return "icons/svg/aura.svg";
+  const used = [...(actor?.effects ?? []).filter(e => !e.disabled).map(e => e.icon ?? e.img), ...taken];
+  return markers.find(m => !used.includes(m)) ?? markers[used.filter(u => markers.includes(u)).length % markers.length];
+}
+
+/** Apply conditions to tokens. picks = [{ status?, name, icon, custom? }] */
 export async function applyConditions(tokens, picks, durationType, sourceToken) {
   for (const t of tokens) {
     const actor = t.actor;
     if (!actor) continue;
-    const data = picks.map(p => effectData({ ...p, durationType, targetToken: t.document ?? t, sourceToken }));
+    const taken = [];
+    const data = picks.map(p => {
+      const icon = p.custom ? nextMarker(actor, taken) : p.icon;
+      if (p.custom) taken.push(icon);
+      return effectData({ ...p, icon, durationType, targetToken: t.document ?? t, sourceToken });
+    });
     if (data.length) await actor.createEmbeddedDocuments("ActiveEffect", data);
   }
 }
@@ -115,7 +133,7 @@ export function showEffectCard(token) {
   const list = token?.visible === false ? [] : customEffects(token?.actor);
   if (!list.length) return hideEffectCard();
   const el = effCardEl();
-  el.innerHTML = list.map(e => `<div>${esc(e.name)}</div>`).join("");
+  el.innerHTML = list.map(e => `<div><img src="${esc(e.icon ?? e.img ?? "")}" alt="">${esc(e.name)}</div>`).join("");
   placeEffCard(token);
   el.classList.add("on");
   effShown = token;
@@ -186,7 +204,7 @@ export async function openConditionDialog(tokens) {
             const sourceId = form.querySelector('select[name="source"]')?.value;
             const sourceToken = sourceId ? canvas.scene?.tokens.get(sourceId) ?? null : null;
             const picks = picked.map(s => ({ status: s, name: s.name, icon: s.icon }));
-            if (custom) picks.push({ name: custom, icon: "icons/svg/aura.svg" });
+            if (custom) picks.push({ name: custom, custom: true });
             if (!picks.length) { ui.notifications.warn("Pick a condition or type one in Other."); return resolve(null); }
             await applyConditions(tokens, picks, durationType, sourceToken);
             resolve({ picks, durationType });
