@@ -85,12 +85,14 @@ Theatre Inserts only takes a portrait out of its tray with Ctrl + right-click, o
 - **middle-click** (press the mouse wheel on) a portrait.
 Either way takes the actor off the stage, the same as Theatre's own Remove from Stage. Each person can turn it off with "Theatre: quick remove from the tray". Only runs when Theatre Inserts is active. Tested in Chromium against Theatre's real tray styles with a stand-in for Theatre itself (10/10). Not tested in a live Foundry.
 
-## Theatre cast window (v1.15)
+## Theatre cast window (v1.15, v1.16)
 A larger pop-out of the Theatre Inserts tray. Open it with the new people button just right of Theatre's tray, or set a key for "Open the Theatre cast window" in Configure Controls (none by default).
 - **On the tray** shows everyone in the tray at 76 px. Click to speak as them (the same as a left-click in the tray), right-click to show or hide their portrait, × to take them off the tray. The one you're speaking as is outlined in orange; anyone on screen has a red inner glow.
-- **Add to tray** lists actors you own that have a Theatre portrait set. Click to add and speak as them, Shift-click to add only. The search box finds any actor you own by name.
+- **Add to tray** lists actors you own with a token in the current scene, then actors with a Theatre portrait set. Click to add and speak as them, Shift-click to add only. The search box finds any actor you own by name.
 
-The window follows the tray, so changes made in either place show in both. Tested in Chromium against Theatre's real styles with a stand-in for Theatre itself (18/18). Not tested in a live Foundry.
+Theatre empties its tray every time Foundry loads. Since v1.16 your tray is remembered and put back on load; each person can turn this off with "Theatre: remember the tray".
+
+The window follows the tray, so changes made in either place show in both. Tested in Chromium against Theatre's real styles with a stand-in for Theatre itself, including a reload (23/23). Not tested in a live Foundry.
 
 ## Mark dead hotkey (v1.7)
 GM only. Hover a token and press **K** (or select several and press K).

@@ -5,9 +5,13 @@
  *   On the tray  - everyone in Theatre's tray. Click: speak as them (brings them on screen),
  *                  the same as a left-click in the tray. Right-click: show or hide their
  *                  portrait on screen. ×: take them off the tray.
- *   Add to tray  - actors with a Theatre portrait set, or any actor you own via the search box.
+ *   Add to tray  - actors with a token in the current scene, actors with a Theatre portrait set,
+ *                  or any actor you own via the search box.
  *                  Click: put them on the tray and speak as them. Shift-click: tray only.
  * Open it with the button next to Theatre's tray, or a key set in Configure Controls.
+ *
+ * Theatre clears its tray on every reload; this remembers it per person and puts it back
+ * (setting "Theatre: remember the tray").
  */
 
 const MOD = "f2f-tools";
@@ -41,14 +45,19 @@ export class TheatreCast extends Application {
     });
   }
 
+  // [{label, tiles}] - while searching, one list of matches; otherwise this scene's actors, then Theatre portraits.
   get candidates() {
     const onTray = new Set(this.staged.map(s => s.id));
     const q = this.query.trim().toLowerCase();
-    return (game.actors ?? []).filter(a => a.isOwner && !onTray.has(tid(a)))
-      .filter(a => q ? (nameOf(a).toLowerCase().includes(q) || a.name.toLowerCase().includes(q)) : !!a.flags?.theatre?.baseinsert)
-      .sort((a, b) => nameOf(a).localeCompare(nameOf(b)))
-      .slice(0, 60)
+    const pool = (game.actors ?? []).filter(a => a.isOwner && !onTray.has(tid(a)));
+    const list = arr => arr.sort((a, b) => nameOf(a).localeCompare(nameOf(b))).slice(0, 60)
       .map(a => ({ id: tid(a), actorId: a.id, src: portraitOf(a), name: nameOf(a) }));
+    if (q) return [{ label: null, tiles: list(pool.filter(a => nameOf(a).toLowerCase().includes(q) || a.name.toLowerCase().includes(q))) }];
+    const inScene = new Set((canvas?.scene?.tokens ?? []).map(t => t.actorId).filter(Boolean));
+    return [
+      { label: "In this scene", tiles: list(pool.filter(a => inScene.has(a.id))) },
+      { label: "Theatre portraits", tiles: list(pool.filter(a => !inScene.has(a.id) && a.flags?.theatre?.baseinsert)) }
+    ].filter(g => g.tiles.length);
   }
 
   async _renderInner() {
@@ -60,7 +69,8 @@ export class TheatreCast extends Application {
       <div class="f2f-cast-grid staged">${staged.map(t => tile(t, true)).join("") || '<p class="none">Nobody is on the tray yet.</p>'}</div>
       <h3>Add to tray <span class="hint">click: add and speak · shift-click: add only</span></h3>
       <input type="search" class="f2f-cast-search" placeholder="Search your actors by name" value="${esc(this.query)}">
-      <div class="f2f-cast-grid add">${cands.map(t => tile(t, false)).join("") || `<p class="none">${this.query ? "No matching actors." : "Actors with a Theatre portrait set show here. Search to find any other."}</p>`}</div>
+      ${cands.map(g => `${g.label ? `<h4>${g.label}</h4>` : ""}<div class="f2f-cast-grid add">${g.tiles.map(t => tile(t, false)).join("")}</div>`).join("")
+        || `<p class="none">${this.query ? "No matching actors." : "Actors in this scene, and actors with a Theatre portrait set, show here. Search to find any other."}</p>`}
     </div>`);
   }
 
@@ -122,6 +132,27 @@ export class TheatreCast extends Application {
 }
 
 let cast = null;
+
+// Remember the tray between sessions (Theatre itself starts empty on every load).
+const remembered = () => { try { return game.settings.get(MOD, "theatreCastTray") ?? []; } catch (e) { return []; } };
+function saveTray() {
+  const bar = theatre()?.instance?.theatreNavBar;
+  if (!bar || !game.settings.get(MOD, "theatreCastRemember")) return;
+  const ids = [...bar.querySelectorAll(".theatre-control-nav-bar-item")].map(el => el.getAttribute("imgId")?.replace(/^theatre-/, "")).filter(Boolean);
+  if (JSON.stringify(ids) !== JSON.stringify(remembered())) game.settings.set(MOD, "theatreCastTray", ids);
+}
+function restoreTray() {
+  const T = theatre(), bar = T?.instance?.theatreNavBar;
+  if (!bar) return;
+  if (game.settings.get(MOD, "theatreCastRemember")) {
+    for (const id of remembered()) {
+      const actor = game.actors.get(id);
+      if (actor?.isOwner && !T.instance.stage?.[tid(actor)]) { try { T.addToNavBar(actor); } catch (e) { console.warn("f2f-tools | couldn't put back on the Theatre tray:", actor.name, e); } }
+    }
+  }
+  let t;
+  new MutationObserver(() => { clearTimeout(t); t = setTimeout(saveTray, 300); }).observe(bar, { childList: true });
+}
 export function openCast() {
   if (!theatre()?.instance) return ui.notifications.warn("Theatre Inserts isn't running.");
   cast ??= new TheatreCast();
@@ -141,6 +172,12 @@ function addTrayButton() {
 }
 
 Hooks.once("init", () => {
+  game.settings.register(MOD, "theatreCastRemember", {
+    name: "Theatre: remember the tray",
+    hint: "Theatre Inserts empties its tray every time Foundry loads. This puts back whoever was on your tray last time.",
+    scope: "client", config: true, type: Boolean, default: true
+  });
+  game.settings.register(MOD, "theatreCastTray", { scope: "client", config: false, type: Array, default: [] });
   game.keybindings.register(MOD, "theatreCast", {
     name: "Open the Theatre cast window",
     hint: "A larger pop-out of the Theatre Inserts tray.",
@@ -149,9 +186,10 @@ Hooks.once("init", () => {
 });
 
 Hooks.once("ready", () => {
-  if (game.modules.get("theatre")?.active) setTimeout(addTrayButton, 500);
+  if (game.modules.get("theatre")?.active) setTimeout(() => { addTrayButton(); restoreTray(); }, 500);
   const mod = game.modules.get(MOD);
   mod.api ??= {};
   mod.api.theatreCast = { open: openCast, TheatreCast };
 });
+Hooks.on("canvasReady", () => cast?.rendered && cast.render(false));
 Hooks.on("renderChatLog", () => { if (game.modules.get("theatre")?.active) setTimeout(addTrayButton, 500); });
