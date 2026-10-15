@@ -147,3 +147,20 @@ body.f2f-compact-menus #context-menu li.context-item {
   box-shadow: 0 1px 3px rgba(0,0,0,0.6); }
 .f2f-tray-x.on { display: block; }
 .f2f-tray-x:hover { background: #c22; }
+
+/* Theatre cast window */
+#f2f-theatre-cast .window-content { padding: 6px 8px; }
+.f2f-cast h3 { margin: 6px 0 4px; font-size: 14px; border-bottom: 1px solid #999; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.f2f-cast h3 .hint { font-size: 11px; font-weight: normal; color: #666; }
+.f2f-cast-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px; margin-bottom: 6px; }
+.f2f-cast-tile { position: relative; cursor: pointer; text-align: center; border: 2px solid transparent; border-radius: 6px; padding: 3px; background: rgba(0,0,0,0.06); }
+.f2f-cast-tile:hover { border-color: #b46a00; background: rgba(255,100,0,0.08); }
+.f2f-cast-tile img { width: 76px; height: 76px; object-fit: cover; object-position: 50% 0; border: 0; border-radius: 4px; display: block; margin: 0 auto; }
+.f2f-cast-tile .nm { display: block; font-size: 12px; line-height: 1.2; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.f2f-cast-tile.on { border-color: #c22; box-shadow: 0 0 6px inset #ff6400; }
+.f2f-cast-tile.speaking { border-color: #ff6400; box-shadow: 0 0 8px #ff6400; }
+.f2f-cast-tile .x { position: absolute; top: -4px; right: -4px; width: 18px; height: 18px; border-radius: 50%; background: #8b1a1a; color: #fff; border: 1px solid #fff; font: bold 14px/16px sans-serif; text-align: center; display: none; }
+.f2f-cast-tile:hover .x { display: block; }
+.f2f-cast-search { width: 100%; margin-bottom: 6px; }
+.f2f-cast .none { grid-column: 1 / -1; color: #666; font-style: italic; margin: 4px 0; }
+.f2f-cast-btn i { font-size: 16px; line-height: 36px; display: block; text-align: center; }
