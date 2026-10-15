@@ -1,0 +1,35 @@
+<h2 class="f2f-sec">Character</h2>
+<div class="f2f-pad f2f-fields">
+	<label class="wide">Name <input type="text" name="name" value="{{actor.name}}" /></label>
+	<label>Level <input type="text" name="system.details.level" value="{{system.details.level}}" data-dtype="Number" /></label>
+	<label>XP <input type="text" name="system.details.exp" value="{{system.details.exp}}" data-dtype="Number" /></label>
+	<label>Race <input type="text" name="system.details.race" value="{{system.details.race}}" /></label>
+	<label>Class <input type="text" name="system.details.class" value="{{system.details.class}}" /></label>
+	<label>Paragon path <input type="text" name="system.details.paragon" value="{{system.details.paragon}}" /></label>
+	<label>Epic destiny <input type="text" name="system.details.epic" value="{{system.details.epic}}" /></label>
+</div>
+<h2 class="f2f-sec">Ability Scores</h2>
+<div class="f2f-pad f2f-fields f2f-abil">
+	{{#each system.abilities as |ab a|}}
+	<label>{{ab.label}} <input type="text" name="system.abilities.{{a}}.value" value="{{ab.value}}" data-dtype="Number" /></label>
+	{{/each}}
+</div>
+<h2 class="f2f-sec">Hit Points and Surges</h2>
+<div class="f2f-pad f2f-fields">
+	<label>Max HP {{#if system.attributes.hp.autototal}}<span class="muted" data-tooltip="Worked out from class, level and Con. Change this under HP options.">{{system.attributes.hp.max}} (auto)</span>{{else}}<input type="text" name="system.attributes.hp.max" value="{{system.attributes.hp.max}}" data-dtype="Number" />{{/if}}</label>
+	<label>Surges per day <input type="text" name="system.details.surges.max" value="{{system.details.surges.max}}" data-dtype="Number" /></label>
+	<label>Magic item uses per day <input type="text" name="system.magicItemUse.perDay" value="{{system.magicItemUse.perDay}}" data-dtype="Number" /></label>
+	<label>Milestones <input type="text" name="system.magicItemUse.milestone" value="{{system.magicItemUse.milestone}}" data-dtype="Number" /></label>
+</div>
+<p class="f2f-pad f2f-links">
+	<a class="f2f-btn health-option">HP options</a>
+	<a class="f2f-btn surge-bonus">Surge bonuses</a>
+	<a class="f2f-btn secondwind-bonus">Second wind bonuses</a>
+	<a class="f2f-btn death-save-bonus">Death save bonuses</a>
+	<a class="f2f-btn action-point-extra">Action point riders</a>
+	<a class="f2f-btn custom-roll-descriptions">Check descriptions</a>
+	<a class="f2f-btn encumbrance-options">Encumbrance</a>
+</p>
+<div class="dnd4eBeta f2f-stock">
+	{{> "systems/dnd4e/templates/actors/parts/actor-details.html"}}
+</div>

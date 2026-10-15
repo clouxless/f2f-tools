@@ -1,0 +1,143 @@
+<form class="{{cssClass}} f2f-form" autocomplete="off">
+
+	{{!-- Header: name, level and class, type line --}}
+	<header class="f2f-head">
+		<div class="image-frame">
+			<img class="portrait" src="{{actor.img}}" data-edit="img" data-tooltip="{{actor.name}}" height="64" width="64" />
+			<a class="hover-icon actor-art" data-tooltip="Show image"><i class="fas fa-image fa-fw"></i></a>
+		</div>
+		<div class="cols">
+			<div class="r"><span class="name">{{actor.name}}</span><span class="lvl">Level {{system.details.level}} {{system.details.class}}</span></div>
+			<div class="r r2"><span>{{f2f.typeLine}}</span><span>{{system.details.alignment}}</span></div>
+			<div class="r r3"><span>{{f2f.classLine}}</span><span>XP {{system.details.exp}}</span></div>
+		</div>
+	</header>
+
+	{{!-- Stat block vitals --}}
+	<section class="f2f-vitals">
+		<div class="l">
+			<b class="health-option rollable" data-tooltip="Hit point options">HP</b>
+			<input class="f2f-num {{#if system.details.isBloodied}}bloodied{{/if}}" type="text" name="system.attributes.hp.value" value="{{system.attributes.hp.value}}" data-dtype="Number" data-tooltip="Current hit points (type +5 or -5 to adjust)" />/{{system.attributes.hp.max}};
+			<b>Bloodied</b> {{system.details.bloodied}};
+			<b>Temp</b> <input class="f2f-num" type="text" name="system.attributes.temphp.value" value="{{system.attributes.temphp.value}}" placeholder="0" data-dtype="Number" data-tooltip="Temporary hit points" />
+		</div>
+		<div class="rt"><b class="rollInitiative rollable" data-tooltip="Roll initiative">Initiative</b> <span class="init-bonus rollable" data-tooltip="Initiative bonuses">{{f2fSigned system.attributes.init.value}}</span></div>
+
+		<div class="l">
+			<b class="heal-menu rollable" data-tooltip="Healing">Healing Surges</b>
+			<input class="f2f-num" type="text" name="system.details.surges.value" value="{{system.details.surges.value}}" data-dtype="Number" data-tooltip="Healing surges left" />/{{system.details.surges.max}}
+			<span class="muted surge-bonus rollable" data-tooltip="Surge value and bonuses">({{system.details.surgeValue}} hp)</span>
+		</div>
+		<div class="rt" data-skill="prc"><b class="skill-name rollable" data-tooltip="Roll Perception">Perception</b> <span class="skill-bonus rollable">{{f2fSigned system.skills.prc.total}}</span></div>
+
+		<div class="l f2f-defs">
+			{{#each system.defences as |def d|}}<span data-defence="{{d}}"><b class="def-name rollable" data-tooltip="Roll {{lookup ../f2f.defNames d}}">{{lookup ../f2f.defNames d}}</b> <span class="defence-bonus rollable" data-tooltip="{{lookup ../f2f.defNames d}} bonuses">{{def.value}}</span></span>{{#unless @last}}, {{/unless}}{{/each}}
+		</div>
+		<div class="rt" data-skill="ins"><b class="skill-name rollable" data-tooltip="Roll Insight">Insight</b> <span class="skill-bonus rollable">{{f2fSigned system.skills.ins.total}}</span></div>
+
+		<div class="l"><b class="movement-dialog rollable" data-tooltip="{{moveTitle}}">Speed</b> {{system.movement.walk.value}} <span class="muted">(shift {{system.movement.shift.value}}, run {{system.movement.run.value}})</span></div>
+		<div class="rt muted">Passive <span data-passive="pasprc"><span class="passive-message rollable" data-tooltip="Passive Perception">{{system.passive.pasprc.value}}</span></span> / <span data-passive="pasins"><span class="passive-message rollable" data-tooltip="Passive Insight">{{system.passive.pasins.value}}</span></span></div>
+
+		<div class="l">
+			<b class="roll-save rollable" data-tooltip="Roll a saving throw">Saving Throws</b> <span class="roll-save-bonus rollable" data-tooltip="Saving throw bonuses">{{f2fSigned system.details.saves.value}}</span>;
+			<b class="action-point rollable" data-tooltip="Spend an action point">Action Points</b> <input class="f2f-num" type="text" name="system.actionpoints.value" value="{{system.actionpoints.value}}" placeholder="0" data-dtype="Number" />
+		</div>
+		<div class="rt">{{f2f.senses}}</div>
+
+		<div class="l">
+			<b class="second-wind rollable" data-tooltip="Use your second wind">Second Wind</b>
+			<label class="f2f-check" data-tooltip="Second wind used this encounter"><input type="checkbox" name="system.details.secondwind" data-dtype="Boolean" {{checked system.details.secondwind}} /><span></span></label>;
+			<b class="death-save rollable" data-tooltip="Roll a death saving throw">Death Saves</b>
+			<span class="f2f-death">{{#each f2f.deathPips}}<a class="pip{{#if on}} on{{/if}}" data-n="{{n}}" data-tooltip="Failed death saves"></a>{{/each}}</span>
+		</div>
+		<div class="rt">
+			<b>Magic Item Uses</b>
+			<input class="f2f-num" type="text" name="system.magicItemUse.dailyuse" value="{{system.magicItemUse.dailyuse}}" data-dtype="Number" data-tooltip="Daily magic item uses left" />/{{f2f.magicUses}}
+		</div>
+		{{#if f2f.resist}}<div class="full"><b>Resist</b> {{f2f.resist}}</div>{{/if}}
+		{{#if f2f.vuln}}<div class="full"><b>Vulnerable</b> {{f2f.vuln}}</div>{{/if}}
+	</section>
+
+	<section class="f2f-abilities">
+		{{#each f2f.abilities}}<span data-ability="{{key}}"><b class="ability-name rollable" data-tooltip="Roll a {{label}} check">{{label}}</b> {{value}} <span class="num">({{f2fSigned check}})</span></span>{{/each}}
+	</section>
+
+	<section class="f2f-extra">
+		<p><b>Skills</b> {{#each f2f.trainedSkills}}<span data-skill="{{key}}"><span class="skill-name rollable">{{label}}</span> {{f2fSigned total}}</span>{{#unless @last}}, {{/unless}}{{else}}<span class="muted">none trained</span>{{/each}}</p>
+		{{#if f2f.languages}}<p><b>Languages</b> {{f2f.languages}}</p>{{/if}}
+		<p><b>Equipment</b> {{#each f2f.equipment}}<span class="{{#if auto}}auto{{/if}}">{{name}}</span>{{#unless @last}}, {{/unless}}{{else}}<span class="muted">pin items on the Gear tab</span>{{/each}}</p>
+	</section>
+
+	{{#if owner}}
+	<section class="f2f-btns">
+		<a class="f2f-btn short-rest">Short Rest</a><a class="f2f-btn long-rest">Extended Rest</a><a class="f2f-btn second-wind">Second Wind</a><a class="f2f-btn heal-menu">Healing</a><a class="f2f-btn action-point">Action Point</a><a class="f2f-btn roll-save">Saving Throw</a><a class="f2f-btn death-save">Death Save</a>
+	</section>
+	{{/if}}
+
+	<nav class="f2f-tabs tabs" data-group="primary">
+		<a class="item" data-tab="main">Main</a>
+		<a class="item" data-tab="actions">Actions</a>
+		<a class="item" data-tab="skills">Skills</a>
+		<a class="item" data-tab="gear">Gear</a>
+		<a class="item" data-tab="features">Features</a>
+		<a class="item" data-tab="rituals">Rituals</a>
+		<a class="item" data-tab="bio">Bio</a>
+		<a class="item" data-tab="manage">Manage</a>
+		<a class="item" data-tab="effects">Effects</a>
+	</nav>
+
+	<section class="f2f-body">
+		<div class="tab main" data-group="primary" data-tab="main">
+			{{> "modules/f2f-tools/pc-sheet/templates/parts/main.hbs"}}
+		</div>
+		<div class="tab actions" data-group="primary" data-tab="actions">
+			{{> "modules/f2f-tools/pc-sheet/templates/parts/actions.hbs"}}
+		</div>
+		<div class="tab skills" data-group="primary" data-tab="skills">
+			{{> "modules/f2f-tools/pc-sheet/templates/parts/skills.hbs"}}
+		</div>
+		<div class="tab gear" data-group="primary" data-tab="gear">
+			{{> "modules/f2f-tools/pc-sheet/templates/parts/gear.hbs"}}
+		</div>
+		<div class="tab features" data-group="primary" data-tab="features">
+			{{> "modules/f2f-tools/pc-sheet/templates/parts/features.hbs"}}
+		</div>
+		<div class="tab rituals" data-group="primary" data-tab="rituals">
+			<h2 class="f2f-sec">Rituals{{#if owner}}<a class="item-control item-create" data-type="ritual"><i class="fas fa-plus"></i> Add</a>{{/if}}</h2>
+			<ol class="item-list f2f-list">
+				{{#each f2f.rituals as |item|}}
+				<li class="item" data-item-id="{{item._id}}">
+					<div class="item-name f2f-row">
+						<img class="item-image rollable" src="{{item.img}}" width="18" height="18" data-tooltip="Perform the ritual" />
+						<h4>{{item.name}}</h4>
+						{{#if @root.owner}}<a class="item-control item-edit" data-tooltip="Edit"><i class="fas fa-edit"></i></a>{{/if}}
+					</div>
+				</li>
+				{{else}}<li class="f2f-empty">No rituals.</li>{{/each}}
+			</ol>
+		</div>
+		<div class="tab bio" data-group="primary" data-tab="bio">
+			<h2 class="f2f-sec">Details</h2>
+			<div class="f2f-pad f2f-fields">
+				<label>Gender <input type="text" name="system.details.gender" value="{{system.details.gender}}" /></label>
+				<label>Age <input type="text" name="system.details.age" value="{{system.details.age}}" /></label>
+				<label>Height <input type="text" name="system.details.height" value="{{system.details.height}}" /></label>
+				<label>Weight <input type="text" name="system.details.weight" value="{{system.details.weight}}" /></label>
+				<label>Alignment <input type="text" name="system.details.alignment" value="{{system.details.alignment}}" /></label>
+				<label>Deity <input type="text" name="system.details.deity" value="{{system.details.deity}}" /></label>
+			</div>
+			<h2 class="f2f-sec">Biography</h2>
+			<div class="f2f-pad f2f-editor">
+				{{editor biographyHTML target="system.biography" button=true owner=owner editable=editable engine="prosemirror" collaborate=false}}
+			</div>
+		</div>
+		<div class="tab manage" data-group="primary" data-tab="manage">
+			{{> "modules/f2f-tools/pc-sheet/templates/parts/manage.hbs"}}
+		</div>
+		<div class="tab effects" data-group="primary" data-tab="effects">
+			<div class="dnd4eBeta f2f-stock">
+				{{> "systems/dnd4e/templates/actors/parts/active-effects.html"}}
+			</div>
+		</div>
+	</section>
+</form>

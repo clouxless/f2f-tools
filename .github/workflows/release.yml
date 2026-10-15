@@ -1,0 +1,22 @@
+name: Release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check module.json matches the tag
+        run: |
+          v=$(jq -r .version module.json)
+          [ "v$v" = "$GITHUB_REF_NAME" ] || { echo "module.json version $v does not match tag $GITHUB_REF_NAME"; exit 1; }
+          jq -e --arg u "https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/f2f-tools.zip" '.download == $u' module.json || { echo "download link in module.json is not for this tag"; exit 1; }
+      - name: Build zip
+        run: zip -r f2f-tools.zip module.json README.md scripts styles data pc-sheet
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" module.json f2f-tools.zip --title "Table Tools $GITHUB_REF_NAME" --generate-notes

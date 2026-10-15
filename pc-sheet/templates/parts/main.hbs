@@ -1,0 +1,35 @@
+{{#if editable}}
+<div class="f2f-ctl">
+	<span>Group powers by</span>
+	<span class="f2f-group">
+		<button type="button" data-group="action" class="{{#if (f2fEq f2f.groupBy 'action')}}on{{/if}}">Action</button><button type="button" data-group="usage" class="{{#if (f2fEq f2f.groupBy 'usage')}}on{{/if}}">Power Type</button>
+	</span>
+</div>
+{{/if}}
+
+{{#each f2f.powerSections as |sec|}}
+	{{#if sec.isTraits}}
+		{{#if @root.f2f.hasTraits}}
+		<div class="f2f-secwrap" data-sec="traits">
+			<h2 class="f2f-sec" data-sec="traits"><span class="lhs">{{#if @root.editable}}<i class="fas fa-grip-lines f2f-handle" data-tooltip="Drag to move this section"></i>{{/if}}Traits</span></h2>
+			<ol class="item-list f2f-powers">
+				{{#each @root.f2f.traits as |t|}}
+				<li class="item f2f-trait" data-item-id="{{t.id}}">
+					<div class="f2f-ph">
+						{{#if @root.editable}}<span class="f2f-handle"><i class="fas fa-grip-vertical"></i></span>{{/if}}
+						<img class="item-image rollable" src="{{t.img}}" width="16" height="16" data-tooltip="Post to chat" />
+						<a class="f2f-row-toggle nm">{{t.name}}</a>
+						{{#if @root.owner}}<a class="item-control item-edit" data-tooltip="Edit"><i class="fas fa-edit"></i></a>{{/if}}
+					</div>
+					{{#if t.open}}<div class="f2f-pb">{{{t.body}}}</div>{{/if}}
+				</li>
+				{{/each}}
+			</ol>
+		</div>
+		{{/if}}
+	{{else}}
+		{{> "modules/f2f-tools/pc-sheet/templates/parts/power-section.hbs" sec=sec}}
+	{{/if}}
+{{/each}}
+
+{{#unless f2f.hasTraits}}{{#if owner}}<p class="f2f-hint">Pin features on the Features tab to show them here as Traits.</p>{{/if}}{{/unless}}

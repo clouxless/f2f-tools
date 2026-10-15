@@ -1,0 +1,21 @@
+<p class="f2f-hint">Actions every character can take. Click a name to read it, click the icon to post it to chat{{#if editable}} or roll it{{/if}}.</p>
+{{#each f2f.actionSections as |sec|}}
+<h2 class="f2f-sec">{{sec.label}}</h2>
+<ol class="f2f-powers f2f-actions">
+	{{#each sec.items as |a|}}
+	<li class="f2f-action" data-act="act-{{a.key}}">
+		<div class="f2f-ph">
+			<a class="f2f-ico f2f-act-use{{#if a.rolls}} rolls{{/if}}" data-tooltip="{{#if a.sys}}Use {{a.name}}{{else if a.rolls}}Roll {{a.name}}{{else}}Post {{a.name}} to chat{{/if}}"><i class="fas {{#if a.rolls}}fa-dice-d20{{else}}{{a.icon}}{{/if}}"></i></a>
+			<a class="f2f-row-toggle nm">{{a.name}}</a>
+			<span class="tag">{{a.source}}</span>
+		</div>
+		{{#if a.open}}
+		<div class="f2f-pb">
+			{{#each a.lines}}<p class="hang"><b>{{label}}:</b> {{text}}</p>{{/each}}
+			{{#if a.skills}}<p class="f2f-skillrolls">{{#each a.skills}}<span data-skill="{{key}}"><a class="skill-name rollable f2f-btn">Roll {{label}} {{f2fSigned total}}</a></span>{{/each}}</p>{{/if}}
+		</div>
+		{{/if}}
+	</li>
+	{{/each}}
+</ol>
+{{/each}}

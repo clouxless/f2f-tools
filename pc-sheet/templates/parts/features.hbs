@@ -1,0 +1,18 @@
+<p class="f2f-hint">Click <i class="fas fa-thumbtack"></i> to show a feature under Traits on the Main tab.</p>
+{{#each f2f.features as |sec|}}
+<h2 class="f2f-sec">{{sec.label}}{{#if @root.owner}}<a class="item-control item-create" data-type="{{sec.type}}" data-tooltip="Add"><i class="fas fa-plus"></i> Add</a>{{/if}}</h2>
+<ol class="item-list f2f-list">
+	{{#each sec.items as |it|}}
+	<li class="item" data-item-id="{{it.id}}">
+		<div class="item-name f2f-row">
+			{{#if @root.editable}}<span class="f2f-handle"><i class="fas fa-grip-vertical"></i></span>{{/if}}
+			<img class="item-image rollable" src="{{it.img}}" width="18" height="18" data-tooltip="Post to chat" />
+			<h4 data-tooltip="Show details">{{it.name}}</h4>
+			{{#if @root.editable}}<a class="f2f-pin {{#if it.pinned}}on{{/if}}" data-tooltip="{{#if it.pinned}}Shown under Traits (click to remove){{else}}Show under Traits on Main{{/if}}"><i class="fas fa-thumbtack"></i></a>{{/if}}
+			{{#if @root.owner}}<a class="item-control item-edit" data-tooltip="Edit"><i class="fas fa-edit"></i></a>{{/if}}
+		</div>
+	</li>
+	{{else}}<li class="f2f-empty">None.</li>
+	{{/each}}
+</ol>
+{{/each}}

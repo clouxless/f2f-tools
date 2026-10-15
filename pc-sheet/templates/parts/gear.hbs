@@ -1,0 +1,21 @@
+<p class="f2f-hint">Equipped weapons and implements always show on the Equipment line. Click <i class="fas fa-thumbtack"></i> to show anything else there.</p>
+{{#each f2f.gear as |sec|}}
+<h2 class="f2f-sec">{{sec.label}}{{#if @root.owner}}<a class="item-control item-create" data-type="{{sec.type}}" data-tooltip="Add an item"><i class="fas fa-plus"></i> Add</a>{{/if}}</h2>
+<ol class="item-list f2f-list">
+	{{#each sec.items as |it|}}
+	<li class="item" data-item-id="{{it.id}}">
+		<div class="item-name f2f-row">
+			{{#if @root.editable}}<span class="f2f-handle"><i class="fas fa-grip-vertical"></i></span>{{/if}}
+			<img class="item-image rollable" src="{{it.img}}" width="18" height="18" data-tooltip="Use or post to chat" />
+			<h4 data-tooltip="Show details">{{it.name}}</h4>
+			<span class="tag">{{#if sec.qty}}× {{it.qty}}{{else}}{{it.slot}}{{/if}}</span>
+			{{#if it.canEquip}}{{#if @root.editable}}<a class="item-control item-toggle {{#if it.equipped}}active{{/if}}" data-tooltip="{{#if it.equipped}}Equipped (click to unequip){{else}}Not equipped (click to equip){{/if}}"><i class="fas fa-shield-halved"></i></a>{{/if}}{{/if}}
+			{{#if it.auto}}<span class="f2f-pin auto" data-tooltip="Equipped weapons and implements always show"><i class="fas fa-thumbtack"></i></span>{{else}}{{#if @root.editable}}<a class="f2f-pin {{#if it.pinned}}on{{/if}}" data-tooltip="{{#if it.pinned}}On the Equipment line (click to remove){{else}}Show on the Equipment line{{/if}}"><i class="fas fa-thumbtack"></i></a>{{/if}}{{/if}}
+			{{#if @root.owner}}<a class="item-control item-edit" data-tooltip="Edit"><i class="fas fa-edit"></i></a>{{/if}}
+		</div>
+	</li>
+	{{else}}<li class="f2f-empty">None.</li>
+	{{/each}}
+</ol>
+{{/each}}
+{{#if f2f.currency}}<p class="f2f-pad"><b>Coins</b> {{f2f.currency}}</p>{{/if}}

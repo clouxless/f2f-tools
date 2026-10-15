@@ -1,0 +1,15 @@
+<h2 class="f2f-sec">Skills</h2>
+<table class="f2f-tbl">
+	<thead><tr><th></th><th>Skill</th><th>Ability</th><th class="r">Bonus</th></tr></thead>
+	<tbody>
+	{{#each f2f.skillRows}}
+	<tr class="{{#if trained}}trained{{/if}}">
+		<td data-skill="{{key}}">{{#if @root.editable}}<a class="training-toggle skill-training" data-tooltip="{{hover}} (click to change)">{{{icon}}}</a><input type="hidden" name="system.skills.{{key}}.value" value="{{value}}" data-dtype="Number" />{{else}}{{{icon}}}{{/if}}</td>
+		<td data-skill="{{key}}"><span class="skill-name rollable" data-tooltip="Roll {{label}}">{{label}}</span></td>
+		<td>{{ability}}</td>
+		<td class="r" data-skill="{{key}}"><span class="skill-bonus rollable num" data-tooltip="{{label}} bonuses">{{f2fSigned total}}</span></td>
+	</tr>
+	{{/each}}
+	</tbody>
+</table>
+<p class="f2f-hint">Trained skills appear on the Skills line at the top. Click a skill to roll it, click its bonus to add bonuses.{{#if editable}} The circle sets training.{{/if}}</p>

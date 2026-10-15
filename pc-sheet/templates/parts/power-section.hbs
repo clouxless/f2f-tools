@@ -1,0 +1,25 @@
+<div class="f2f-secwrap" data-sec="{{sec.key}}">
+	<h2 class="f2f-sec {{#if sec.usage}}u-{{sec.usage}}{{/if}}" data-sec="{{sec.key}}">
+		<span class="lhs">{{#if @root.editable}}<i class="fas fa-grip-lines f2f-handle" data-tooltip="Drag to move this section"></i>{{/if}}{{sec.label}}</span>
+		{{#if @root.owner}}<a class="item-control power-create" data-type="{{sec.dataset.type}}" data-tooltip="Add a power"><i class="fas fa-plus"></i> Add</a>{{/if}}
+	</h2>
+	<ol class="item-list f2f-powers">
+		{{#each sec.items as |p|}}
+		<li class="item f2f-power use-{{p.use}}{{#if p.spent}} spent{{/if}}{{#if p.notAvailable}} not-available{{/if}}" data-item-id="{{p.id}}">
+			<div class="f2f-ph">
+				{{#if @root.editable}}<span class="f2f-handle" data-tooltip="Drag to reorder"><i class="fas fa-grip-vertical"></i></span>{{/if}}
+				<a class="item-image f2f-ico rollable" data-tooltip="Use {{p.name}}"><i class="fas {{p.icon}}"></i></a>
+				<a class="f2f-row-toggle nm" data-tooltip="Show or hide the power">{{p.name}}</a>
+				{{#if sec.usage}}<span class="tag">{{p.actionWord}}</span>{{/if}}
+				<span class="use">♦ {{p.useLabel}}{{#if p.recharge}} <a class="item-recharge rollable" data-tooltip="Roll to recharge">{{p.recharge}}</a>{{/if}}</span>
+				{{#if p.trackUse}}
+					{{#if p.multiUse}}<span class="uses">{{p.uses}}/{{p.maxUses}}</span>{{/if}}
+					<a class="f2f-spent" data-tooltip="{{#if p.spent}}Used. Click to mark it unused.{{else}}Click to mark it used.{{/if}}">{{#if p.spent}}<i class="fas fa-check"></i>{{/if}}</a>
+				{{/if}}
+				{{#if @root.owner}}<a class="item-control item-edit" data-tooltip="Edit"><i class="fas fa-edit"></i></a>{{/if}}
+			</div>
+			{{#if p.open}}<div class="f2f-pb">{{{p.body}}}</div>{{/if}}
+		</li>
+		{{/each}}
+	</ol>
+</div>
