@@ -68,7 +68,7 @@ export function effectData({ status, name, icon, durationType, targetToken, sour
     statuses: status ? [status.id] : [],
     description: status?.description ? loc(status.description) : "",
     duration: { rounds, startRound: round, ...(combat ? { combat: combat.id } : {}) },
-    flags: { dnd4e: { effectData }, [MOD]: { condition: true } }
+    flags: { dnd4e: { effectData }, [MOD]: { condition: true, ...(status ? {} : { custom: true }) } }
   };
 }
 
@@ -87,6 +87,52 @@ function describeDuration(e) {
   if (!type) return "until removed";
   const m = e.name?.match(/\(([^)]+)\)$/);
   return m ? m[1] : (CONFIG.DND4EBETA?.durationType?.[type] ?? type);
+}
+
+/* ---------------- hover card for custom effects ---------------- */
+
+// Effects typed into "Other" all share one generic icon, so their text shows in a card under the token on hover.
+export function customEffects(actor) {
+  return (actor?.effects ?? []).filter(e => !e.disabled && e.flags?.[MOD]?.condition && (e.flags[MOD].custom || !(e.statuses?.size ?? e.statuses?.length)));
+}
+
+let effCard = null, effShown = null;
+function effCardEl() {
+  if (effCard?.isConnected) return effCard;
+  effCard = document.createElement("div");
+  effCard.id = "f2f-effcard";
+  effCard.className = "f2f-effcard";
+  document.body.append(effCard);
+  return effCard;
+}
+function placeEffCard(token) {
+  const view = canvas.app.view.getBoundingClientRect();
+  const p = canvas.stage.worldTransform.apply({ x: token.x + token.w / 2, y: token.y + token.h });
+  effCard.style.left = `${view.left + p.x}px`;
+  effCard.style.top = `${view.top + p.y + 6}px`;
+}
+export function showEffectCard(token) {
+  const list = token?.visible === false ? [] : customEffects(token?.actor);
+  if (!list.length) return hideEffectCard();
+  const el = effCardEl();
+  el.innerHTML = list.map(e => `<div>${esc(e.name)}</div>`).join("");
+  placeEffCard(token);
+  el.classList.add("on");
+  effShown = token;
+}
+export function hideEffectCard() {
+  effShown = null;
+  effCard?.classList.remove("on");
+}
+Hooks.on("hoverToken", (token, hovered) => {
+  if (!game.settings.get(MOD, "conditionsHoverCard")) return;
+  if (hovered) showEffectCard(token);
+  else if (effShown === token) hideEffectCard();
+});
+Hooks.on("canvasPan", () => { if (effShown) placeEffCard(effShown); });
+Hooks.on("canvasTearDown", () => hideEffectCard());
+for (const h of ["createActiveEffect", "updateActiveEffect", "deleteActiveEffect"]) {
+  Hooks.on(h, effect => { if (effShown && effect.parent === effShown.actor) showEffectCard(effShown); });
 }
 
 /* ---------------- dialog ---------------- */
@@ -202,6 +248,11 @@ async function onDeleteCombat(combat) {
 }
 
 Hooks.once("init", () => {
+  game.settings.register(MOD, "conditionsHoverCard", {
+    name: "Conditions: show custom effects when hovering a token",
+    hint: "Effects typed into Other in the conditions pop-up show their text in a small card under the token while the mouse is over it.",
+    scope: "client", config: true, type: Boolean, default: true
+  });
   game.settings.register(MOD, "conditionsClearOnCombatEnd", {
     name: "Conditions: clear encounter-long effects when combat ends",
     hint: "When a combat is deleted, remove effects that last until the end of the encounter or until a turn, from everyone who was in it. Save-ends effects stay.",

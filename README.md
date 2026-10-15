@@ -108,6 +108,9 @@ Right-click a token and press the hourglass button in the left column. Tick cond
 - **Until removed:** stays until you delete it. The dialog lists the token's current conditions with a ✕ to remove each.
 Effect names include the duration, e.g. "Dazed (save ends)", so it shows on hover and on the sheet.
 
+### Custom effects on hover (v1.12)
+Anything typed into **Other** in the conditions pop-up gets a generic icon, so its text now shows in a small card under the token while the mouse is over it, with its duration ("-2 to attack rolls (save ends)"). Standard conditions keep their own icons and aren't listed. Custom effects added before v1.12 show too. Each person can turn it off with "Conditions: show custom effects when hovering a token". Tested in Chromium against a stand-in canvas (6/6). Not tested in a live Foundry.
+
 ## Power names on templates (v1.4)
 "Place Measured Template" from a power labels the template with the power's name in the middle of the area, also while you place it. Click the name (with the mouse not over a token) to pop up the power's text. v1.6: the pop-up shows the power-card lines (usage, keywords, action, range, attack, hit, effect) in plain dark text, with the sheet's full description folded under "Full text"; colored backgrounds from the description are stripped so it stays readable. Turn off with "Templates: show the power's name". Templates placed before v1.4 show the name too, since dnd4e already stores the power on them.
 
