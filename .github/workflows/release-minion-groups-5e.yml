@@ -1,0 +1,40 @@
+name: Release Minion Groups (5e)
+# Publishes minion-groups-5e-vX.Y.Z whenever main has a minion-groups-5e/module.json version with no release yet.
+# These releases are never marked "latest", so Table Tools' releases/latest manifest link is unaffected.
+on:
+  push:
+    branches: [main]
+    paths: ["minion-groups-5e/**"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: minion-groups-5e
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read version
+        id: v
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="minion-groups-5e-v$(jq -r .version module.json)"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if gh release view "$tag" >/dev/null 2>&1; then echo "exists=true" >> "$GITHUB_OUTPUT"; echo "$tag is already released"; fi
+      - name: Check the download link points at this version
+        if: steps.v.outputs.exists != 'true'
+        run: |
+          jq -e --arg u "https://github.com/$GITHUB_REPOSITORY/releases/download/${{ steps.v.outputs.tag }}/minion-groups-5e.zip" '.download == $u' module.json || { echo "download link in module.json is not for ${{ steps.v.outputs.tag }}"; exit 1; }
+      - name: Run tests
+        if: steps.v.outputs.exists != 'true'
+        run: node tests/minion-test.mjs
+      - name: Build zip and publish release
+        if: steps.v.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          zip -r minion-groups-5e.zip module.json README.md scripts
+          gh release create "${{ steps.v.outputs.tag }}" module.json minion-groups-5e.zip --target "$GITHUB_SHA" --title "Minion Groups (5e) ${{ steps.v.outputs.tag }}" --notes "Minion Groups for dnd5e. Install with the manifest link in minion-groups-5e/README.md." --latest=false

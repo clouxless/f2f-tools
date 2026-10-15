@@ -1,0 +1,29 @@
+{
+  "id": "minion-groups-5e",
+  "title": "Minion Groups (5e)",
+  "description": "One combat tracker entry per group of minions. The entry and its initiative pass to a living minion when the one it points at drops to 0 HP or is deleted, and the entry shows how many are left. Spun off from Fire to Fire: Table Tools for dnd5e.",
+  "version": "1.0.0",
+  "authors": [
+    {
+      "name": "Cloux"
+    }
+  ],
+  "compatibility": {
+    "minimum": "11",
+    "verified": "12"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "dnd5e",
+        "type": "system"
+      }
+    ]
+  },
+  "esmodules": [
+    "scripts/minion-groups-5e.js"
+  ],
+  "url": "https://github.com/clouxless/f2f-tools/tree/main/minion-groups-5e",
+  "manifest": "https://raw.githubusercontent.com/clouxless/f2f-tools/main/minion-groups-5e/module.json",
+  "download": "https://github.com/clouxless/f2f-tools/releases/download/minion-groups-5e-v1.0.0/minion-groups-5e.zip"
+}
