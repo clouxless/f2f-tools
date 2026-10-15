@@ -14,11 +14,6 @@
 	</header>
 
 	{{!-- Stat block vitals --}}
-	{{!-- Defenses: their own band at the top --}}
-	<section class="f2f-defband">
-		{{#each system.defences as |def d|}}<span data-defence="{{d}}"><b class="def-name rollable" data-tooltip="Roll {{lookup ../f2f.defNames d}}">{{lookup ../f2f.defNames d}}</b> <span class="defence-bonus rollable" data-tooltip="{{lookup ../f2f.defNames d}} bonuses">{{def.value}}</span></span>{{/each}}
-	</section>
-
 	<section class="f2f-vitals">
 		<div class="l">
 			<b class="health-option rollable" data-tooltip="Hit point options">HP</b>
@@ -56,6 +51,11 @@
 		</div>
 		{{#if f2f.resist}}<div class="full"><b>Resist</b> {{f2f.resist}}</div>{{/if}}
 		{{#if f2f.vuln}}<div class="full"><b>Vulnerable</b> {{f2f.vuln}}</div>{{/if}}
+	</section>
+
+	{{!-- Defenses: their own band between the vitals and the ability scores --}}
+	<section class="f2f-defband">
+		{{#each system.defences as |def d|}}<span data-defence="{{d}}"><b class="def-name rollable" data-tooltip="Roll {{lookup ../f2f.defNames d}}">{{lookup ../f2f.defNames d}}</b> <span class="defence-bonus rollable" data-tooltip="{{lookup ../f2f.defNames d}} bonuses">{{def.value}}</span></span>{{/each}}
 	</section>
 
 	<section class="f2f-abilities">
