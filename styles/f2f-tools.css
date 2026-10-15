@@ -122,3 +122,12 @@ body.f2f-compact-menus #context-menu li.context-item {
 #f2f-rules .f2f-rule-actions { margin-top: 4px; text-align: right; font-size: 12px; }
 #f2f-rules .f2f-rules-empty { padding: 10px 4px; opacity: 0.75; font-size: 13px; }
 .f2f-rule-card h3 { margin: 0 0 4px; }
+
+/* Defenses card (hold E over a token) */
+.f2f-defcard { position: fixed; z-index: 1000; transform: translate(-50%, -100%); pointer-events: none; display: none;
+  background: #f4f0e4; color: #191813; border: 1px solid #6f744a; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  padding: 3px 8px 4px; font-size: 14px; line-height: 1.25; white-space: nowrap; text-align: center; }
+.f2f-defcard.on { display: block; }
+.f2f-defcard .nm { font-weight: 700; font-size: 12px; color: #4a4f2d; border-bottom: 1px solid #c9c3ad; margin-bottom: 2px; }
+.f2f-defcard .defs { display: flex; gap: 10px; }
+.f2f-defcard .defs b { font-weight: 700; }

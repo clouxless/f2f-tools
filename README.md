@@ -1,6 +1,6 @@
 # Fire to Fire: Table Tools (f2f-tools)
 
-Custom Foundry module for the Fire to Fire 4e game: shroud counters, Ven's aegis ring, a conditions pop-up with 4e durations, power names on area templates, special ammunition, power icons, a Rules quick-reference tab, a mark-dead hotkey, the stat-block character sheet, Minion Groups and interface fixes. Foundry v11, dnd4e system.
+Custom Foundry module for the Fire to Fire 4e game: shroud counters, Ven's aegis ring, a conditions pop-up with 4e durations, power names on area templates, special ammunition, power icons, a Rules quick-reference tab, a mark-dead hotkey, a hold-E defenses card, the stat-block character sheet, Minion Groups and interface fixes. Foundry v11, dnd4e system.
 
 ## Install
 In Foundry's setup screen, go to Add-on Modules > Install Module, paste this into **Manifest URL** at the bottom, and click Install:
@@ -71,6 +71,13 @@ A **Rules** tab (open-book icon) in the sidebar, next to Settings, with the 4e g
 - Type in the search box to search every entry; names that match come first, then entries whose text matches.
 - Click an entry to read its exact text. Click ☆ to star it; **Starred** keeps your most-used entries one click away (stars are per person). **Post to chat** shares the text with the table.
 - Works for players too. Turn off with "Rules: quick-reference sidebar tab" (reload after).
+
+## Defenses on the map (v1.11)
+Hover a token and **hold E**: a small card above it shows its AC, Fortitude, Reflex and Will. While E is held, moving the mouse to another token shows that one's. Let go of E to hide the card. Rebind the key in Configure Controls.
+- The GM sees every token's defenses.
+- Players see their own characters' by default. "Defenses: players can see" in Module Settings can let them see every token they can see. A monster's name shows on its card for players only when the token's name is set to show on hover or always.
+
+Tested in Chromium against a stand-in canvas (11/11: key, card text and position, switching tokens while held, hiding, GM and player rules). Not tested in a live Foundry.
 
 ## Mark dead hotkey (v1.7)
 GM only. Hover a token and press **K** (or select several and press K).
