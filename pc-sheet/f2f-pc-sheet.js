@@ -458,6 +458,9 @@ export class F2FCharacterSheet extends ActorSheet4e {
 	/* ---------- Listeners ---------- */
 
 	activateListeners(html) {
+		// The system's details block on Manage repeats the Bio tab's Gender, Age, Alignment, Height and Weight boxes.
+		// Two boxes with one name save as "a,b", so drop the Manage copies before anything can submit.
+		html.find(".f2f-stock .details-fluff").remove();
 		super.activateListeners(html);
 		const el = html[0];
 
@@ -673,6 +676,25 @@ Hooks.once("init", () => {
 		`${TPL}/parts/manage.hbs`,
 		`${TPL}/parts/actions.hbs`
 	]);
+});
+
+// Repair Bio fields that the duplicate-box bug in v1.8 to v1.9.3 filled with commas (GM, once per world load).
+const BIO_FIELDS = ["gender", "age", "alignment", "height", "weight"];
+Hooks.once("ready", async () => {
+	if (!game.user.isGM) return;
+	for (const actor of game.actors) {
+		if (actor.type !== "Player Character") continue;
+		const update = {};
+		for (const f of BIO_FIELDS) {
+			const v = actor.system.details?.[f];
+			if (typeof v !== "string" || !v.includes(",")) continue;
+			// Keep the real text: the bug only ever joined copies of the value with commas.
+			const parts = v.split(",").map(x => x.trim()).filter(Boolean);
+			const fixed = parts.length && parts.every(x => x === parts[0]) ? parts[0] : (parts.length ? null : "");
+			if (fixed !== null && fixed !== v) update[`system.details.${f}`] = fixed;
+		}
+		if (Object.keys(update).length) await actor.update(update);
+	}
 });
 
 // One-time copy of the old module's saved flags into this module's scope (GM only).
