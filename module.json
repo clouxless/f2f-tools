@@ -1,8 +1,8 @@
 {
   "id": "f2f-tools",
-  "title": "Fire to Fire: Table Tools v1.9.4",
+  "title": "Fire to Fire: Table Tools v1.10.0",
   "description": "Table tools for the Fire to Fire campaign (dnd4e): shroud counters (plus a shroud clicker in damage rolls) and an aegis ring on tokens, a conditions pop-up with 4e durations, power names on area templates, a special-ammunition drop-down in attack and damage rolls, a standard power icon picker, a Rules quick-reference sidebar tab (4e glossary), a mark-dead hotkey, Minion Groups in the combat tracker, and interface fixes. Includes the Fire to Fire stat-block character sheet.",
-  "version": "1.9.4",
+  "version": "1.10.0",
   "authors": [
     {
       "name": "Cloux"
@@ -51,5 +51,5 @@
   "socket": true,
   "url": "https://github.com/clouxless/f2f-tools",
   "manifest": "https://github.com/clouxless/f2f-tools/releases/latest/download/module.json",
-  "download": "https://github.com/clouxless/f2f-tools/releases/download/v1.9.4/f2f-tools.zip"
+  "download": "https://github.com/clouxless/f2f-tools/releases/download/v1.10.0/f2f-tools.zip"
 }

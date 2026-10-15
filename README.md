@@ -40,7 +40,7 @@ Tested in Node with a mock (`mock-tests/sheet-test.mjs`, 11/11): every template 
 ## Shroud counters (v1.3)
 A plain shroud counter (0 to 4) on any token, drawn as a large purple badge with a white number on the token's top-right corner (`shroud-badge.png`). No automation.
 - **Anyone:** hover the mouse over a token and press **]** to add a shroud or **[** to remove one. Works for players on enemy tokens. Change the keys in Configure Controls > Fire to Fire: Table Tools.
-- **GM:** right-click a token; a row above the token shows **−**, the count, **+** (`shroud-hud.png`).
+- **GM:** the same keys. (The right-click row with **−**, the count and **+** was removed in v1.10.0.)
 - **Cleanup:** shrouds clear when a token drops to 0 HP and when the combat is deleted. Turn either off in Module Settings ("Shrouds: ..."). Each person can hide the badge with "Shrouds: show the badge on tokens".
 
 Players' presses go through the GM's client, so the GM must be logged in. Quick repeated presses all count. Tokens that still show the old small icon lose it the next time their count changes.
@@ -90,7 +90,7 @@ Uses the standard 4e icons that come with the D&D 4E Compendium module (`modules
 ## Ven's aegis (v1.4)
 A blue band around the whole token, on or off. **v1.6:** click the band to pop up the aegis power (Ven's Aegis of Assault) from the sheet of whoever applied it, or the first character with an Aegis power.
 - **Anyone:** hover a token and press **\\** (backslash) to toggle it. Works for players on enemy tokens. Rebind in Configure Controls.
-- **GM:** right-click a token; the shield button in the left column toggles it (lit blue when on).
+- **GM:** the same key. (The shield button on the right-click menu was removed in v1.10.0.)
 - Clears at 0 HP and when the combat is deleted ("Aegis: clear at 0 HP and when combat ends"). The GM must be logged in for players' presses.
 
 ## Conditions with durations (v1.4)

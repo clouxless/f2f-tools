@@ -198,7 +198,7 @@ Hooks.once("ready", () => {
   });
 });
 
-Hooks.on("renderTokenHUD", onRenderTokenHUD);
+// Token HUD controls removed in v1.10: the hotkeys do this job. onRenderTokenHUD is kept for reference.
 Hooks.on("canvasReady", () => {
   const view = canvas.app?.view;
   if (view && !view.f2fAegisClicks) {
