@@ -1,7 +1,9 @@
 name: Release
+# Publishes a release whenever main has a module.json version that has no release yet.
 on:
   push:
-    tags: ["v*"]
+    branches: [main]
+  workflow_dispatch:
 permissions:
   contents: write
 jobs:
@@ -9,14 +11,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check module.json matches the tag
-        run: |
-          v=$(jq -r .version module.json)
-          [ "v$v" = "$GITHUB_REF_NAME" ] || { echo "module.json version $v does not match tag $GITHUB_REF_NAME"; exit 1; }
-          jq -e --arg u "https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/f2f-tools.zip" '.download == $u' module.json || { echo "download link in module.json is not for this tag"; exit 1; }
-      - name: Build zip
-        run: zip -r f2f-tools.zip module.json README.md scripts styles data pc-sheet
-      - name: Publish release
+      - name: Read version
+        id: v
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" module.json f2f-tools.zip --title "Table Tools $GITHUB_REF_NAME" --generate-notes
+        run: |
+          tag="v$(jq -r .version module.json)"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if gh release view "$tag" >/dev/null 2>&1; then echo "exists=true" >> "$GITHUB_OUTPUT"; echo "$tag is already released"; fi
+      - name: Check the download link points at this version
+        if: steps.v.outputs.exists != 'true'
+        run: |
+          jq -e --arg u "https://github.com/$GITHUB_REPOSITORY/releases/download/${{ steps.v.outputs.tag }}/f2f-tools.zip" '.download == $u' module.json || { echo "download link in module.json is not for ${{ steps.v.outputs.tag }}"; exit 1; }
+      - name: Build zip and publish release
+        if: steps.v.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          zip -r f2f-tools.zip module.json README.md scripts styles data pc-sheet
+          gh release create "${{ steps.v.outputs.tag }}" module.json f2f-tools.zip --target "$GITHUB_SHA" --title "Table Tools ${{ steps.v.outputs.tag }}" --generate-notes

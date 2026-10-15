@@ -15,8 +15,8 @@ All settings are under Configure Settings > Module Settings > Fire to Fire: Tabl
 
 ## Releasing a new version
 1. Bump `version` (and the `vX.Y.Z` in `title` and in the `download` link) in `module.json`.
-2. Commit, then push a tag `vX.Y.Z` that matches.
-3. The Release workflow zips the module and publishes a release with `module.json` and `f2f-tools.zip`, which Foundry picks up.
+2. Commit and push to `main`.
+3. The Release workflow sees a version with no release yet, zips the module and publishes release `vX.Y.Z` with `module.json` and `f2f-tools.zip`, which Foundry picks up.
 
 ## Character sheet (v1.8)
 The Fire to Fire stat-block character sheet now ships inside Table Tools; it works exactly as the separate `f2f-pc-sheet` module did (see its README in `foundry-tools/f2f-pc-sheet/`). It still needs Fox's 4e Styling for its fonts.
