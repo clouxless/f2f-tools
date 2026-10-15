@@ -140,3 +140,10 @@ body.f2f-compact-menus #context-menu li.context-item {
 .f2f-effcard div { display: flex; align-items: center; justify-content: center; gap: 5px; }
 .f2f-effcard img { width: 16px; height: 16px; border: 0; flex: none; }
 .f2f-effcard div + div { border-top: 1px solid #d6cfbb; margin-top: 2px; padding-top: 2px; }
+
+/* Theatre Inserts tray: × to remove a portrait */
+.f2f-tray-x { position: fixed; z-index: 10000; display: none; width: 16px; height: 16px; border-radius: 50%;
+  background: #8b1a1a; color: #fff; border: 1px solid #fff; font: bold 14px/14px sans-serif; text-align: center; cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.6); }
+.f2f-tray-x.on { display: block; }
+.f2f-tray-x:hover { background: #c22; }

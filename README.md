@@ -79,6 +79,12 @@ Hover a token and **hold E**: a small card above it shows its AC, Fortitude, Ref
 
 Tested in Chromium against a stand-in canvas (11/11: key, card text and position, switching tokens while held, hiding, GM and player rules). Not tested in a live Foundry.
 
+## Theatre Inserts tray (v1.14)
+Theatre Inserts only takes a portrait out of its tray with Ctrl + right-click, or with "Remove from Stage" on the actor's right-click menu in the Actors tab. Now you can also:
+- hover a portrait in the tray and click the red **×** on its corner;
+- **middle-click** (press the mouse wheel on) a portrait.
+Either way takes the actor off the stage, the same as Theatre's own Remove from Stage. Each person can turn it off with "Theatre: quick remove from the tray". Only runs when Theatre Inserts is active. Tested in Chromium against Theatre's real tray styles with a stand-in for Theatre itself (10/10). Not tested in a live Foundry.
+
 ## Mark dead hotkey (v1.7)
 GM only. Hover a token and press **K** (or select several and press K).
 - Monsters drop to 0 HP, so Drac's dead icon, Minion Groups (the tracker entry moves to a living minion), and the shroud and aegis clean-up all run as they do when you damage it to 0. The dead icon and defeated mark are also set directly, in case nothing else does.
