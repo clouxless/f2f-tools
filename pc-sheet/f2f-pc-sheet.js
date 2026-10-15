@@ -182,6 +182,9 @@ export class F2FCharacterSheet extends ActorSheet4e {
 		f2f.typeLine = typeBits.join(" ").toLowerCase().replace(/^./, c => c.toUpperCase()) + (sub ? ` (${sub})` : "");
 		f2f.classLine = [sys.details.paragon, sys.details.epic, sys.details.deity].filter(Boolean).join(" · ");
 		f2f.defNames = DEFENCE_NAMES;
+		// Free-text field; ignore leftovers like a lone comma
+		const align = String(sys.details.alignment ?? "").trim();
+		f2f.alignment = /[\p{L}\p{N}]/u.test(align) ? align : "";
 
 		// Abilities in stat-block form: score (check bonus)
 		f2f.abilities = ["str", "dex", "wis", "con", "int", "cha"].map(a => ({
